@@ -6,6 +6,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 
 namespace Compass;
 
@@ -33,24 +34,23 @@ public class App : Application
     public override void Initialize()
     {
         Debug.WriteLine("App init method called.");
-        Console.WriteLine("App init method called.");
     }
 
     public override void OnFrameworkInitializationCompleted()
     {
-        Console.WriteLine("OnFrameworkInitializationCompleted start");
+        Debug.WriteLine("OnFrameworkInitializationCompleted start");
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            Console.WriteLine("Creating MainWindow");
+            Debug.WriteLine("Creating MainWindow");
             desktop.MainWindow = new MainWindow();
-            Console.WriteLine("Showing MainWindow");
+            Debug.WriteLine("Showing MainWindow");
             desktop.MainWindow.Show();
-            Console.WriteLine("MainWindow shown");
+            Debug.WriteLine("MainWindow shown");
         }
         else
         {
-            Console.WriteLine("Application lifetime is not classic desktop");
+            Debug.WriteLine("Application lifetime is not classic desktop");
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -306,6 +306,13 @@ public class MainWindow : Window
 
     private static Bitmap LoadImage(string fileName)
     {
+        var assetUri = new Uri($"avares://Compass/{fileName}");
+        if (AssetLoader.Exists(assetUri))
+        {
+            using var stream = AssetLoader.Open(assetUri);
+            return new Bitmap(stream);
+        }
+
         var candidates = new[]
         {
             Path.Combine(AppContext.BaseDirectory, fileName),
